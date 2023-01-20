@@ -5,6 +5,7 @@ contract Course {
     string public name;
     enum Status {Open, Closed}
     Status public status = Status.Open;
+    uint public immutable registrationFee;
     
     struct Student {
         string name;
@@ -15,8 +16,24 @@ contract Course {
     mapping(address => Student) public students;
     address[] public studentAddresses;
 
-    constructor(string memory _courseName) {
+    error InvalidRegistrationFee();
+
+    constructor(string memory _courseName, uint _registrationFee) {
         name = _courseName;
+        registrationFee = _registrationFee;
+    }
+
+    function register(string calldata studentName) public payable onlyOpenCourse {
+        Student storage student = students[msg.sender];
+        require(!student.isRegistered, "Student already registered");
+        if (msg.value != registrationFee) {
+            revert InvalidRegistrationFee();
+        }
+        
+        student.name = studentName;
+        student.isRegistered = true;
+        assert(student.isRegistered);
+        studentAddresses.push(msg.sender);
     }
 
     function closeCourse() public onlyOpenCourse {
