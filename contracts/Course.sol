@@ -59,6 +59,11 @@ contract Course is Ownable {
         return students[student].totalScore / students[student].grades.length;
     }
 
+    function withdraw(uint amount) public onlyOwner {
+        require(amount >= address(this).balance);
+        payable(owner).transfer(amount);
+    }
+
     function closeCourse() public onlyOpenCourse onlyOwner {
         status = Status.Closed;
     }
