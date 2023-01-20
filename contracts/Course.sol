@@ -6,6 +6,7 @@ contract Course {
     enum Status {Open, Closed}
     Status public status = Status.Open;
     uint public immutable registrationFee;
+    uint16 constant internal MAX_GRADE = 1_000;
     
     struct Student {
         string name;
@@ -34,6 +35,26 @@ contract Course {
         student.isRegistered = true;
         assert(student.isRegistered);
         studentAddresses.push(msg.sender);
+    }
+
+    function addGrade(address student, uint16 grade) internal {
+        require(grade <= MAX_GRADE, "Grade exceeds maximum");
+        students[student].grades.push(grade);
+        students[student].totalScore += grade;
+    }
+
+    function addGrades(address student, uint16[] memory grades) public onlyOpenCourse {
+        for (uint i = 0; i < grades.length; i++) {
+            addGrade(student, grades[i]);
+        }
+    }
+
+    function getGrades(address student) external view returns (uint16[] memory) {
+        return students[student].grades;
+    }
+
+    function getFinalScore(address student) public view onlyClosedCourse returns (uint) {
+        return students[student].totalScore / students[student].grades.length;
     }
 
     function closeCourse() public onlyOpenCourse {
