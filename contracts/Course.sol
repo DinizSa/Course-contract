@@ -20,6 +20,7 @@ contract Course is Ownable {
     address[] public studentAddresses;
 
     error InvalidRegistrationFee();
+    event StudentRegistered(string studentName, address studentAddress);
 
     constructor(string memory _courseName, uint _registrationFee) Ownable(msg.sender) {
         name = _courseName;
@@ -37,6 +38,8 @@ contract Course is Ownable {
         student.isRegistered = true;
         assert(student.isRegistered);
         studentAddresses.push(msg.sender);
+
+        emit StudentRegistered(studentName, msg.sender);
     }
 
     function addGrade(address student, uint16 grade) internal {
