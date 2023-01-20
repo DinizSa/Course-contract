@@ -5,6 +5,15 @@ contract Course {
     string public name;
     enum Status {Open, Closed}
     Status public status = Status.Open;
+    
+    struct Student {
+        string name;
+        bool isRegistered;
+        uint16[] grades;
+        uint totalScore;
+    }
+    mapping(address => Student) public students;
+    address[] public studentAddresses;
 
     constructor(string memory _courseName) {
         name = _courseName;
