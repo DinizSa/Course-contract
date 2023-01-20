@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-contract Course {
+import "./Ownable.sol";
+
+contract Course is Ownable {
     string public name;
     enum Status {Open, Closed}
     Status public status = Status.Open;
@@ -19,7 +21,7 @@ contract Course {
 
     error InvalidRegistrationFee();
 
-    constructor(string memory _courseName, uint _registrationFee) {
+    constructor(string memory _courseName, uint _registrationFee) Ownable(msg.sender) {
         name = _courseName;
         registrationFee = _registrationFee;
     }
@@ -43,7 +45,7 @@ contract Course {
         students[student].totalScore += grade;
     }
 
-    function addGrades(address student, uint16[] memory grades) public onlyOpenCourse {
+    function addGrades(address student, uint16[] memory grades) public onlyOpenCourse onlyOwner {
         for (uint i = 0; i < grades.length; i++) {
             addGrade(student, grades[i]);
         }
@@ -57,7 +59,7 @@ contract Course {
         return students[student].totalScore / students[student].grades.length;
     }
 
-    function closeCourse() public onlyOpenCourse {
+    function closeCourse() public onlyOpenCourse onlyOwner {
         status = Status.Closed;
     }
 
